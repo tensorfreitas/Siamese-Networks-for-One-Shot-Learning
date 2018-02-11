@@ -1,2 +1,42 @@
-# Siamese-Networks-for-One-Shot-Learning
-Implementation of Siamese Neural Networks for One-shot Image Recognition
+# Siamese-Networks-for-One-Shot-Learning (Under Construction)
+
+This repository was created for me to familiarize with One Shot Learning. The code uses Keras library and the Omniglot dataset.
+This repository tries to implement the code for Siamese Neural Networks for One-shot Image Recognition by Koch _et al._.
+
+## One-Shot Learning
+
+Currently most deep learning models need generally thousands of labeled samples per class. Data acquisition for most tasks is very expensive. The possibility to have models that could learn from one or a few samples is a lot more interesting than having the need of acquiring and labeling thousands of samples. One could argue that a young child can learn a lot of concepts without needing a large number of examples.  This is where one-shot learning appears: the task of classifying with only having access of one example of each possible class in each test task. This ability of learning from little data is very interesting and could be used in many machine learning problems. 
+
+Despite this paper is focused on images, this concept can be applied to many fields. To fully understand the problem we should describe what is considered an example of an one-shot task. Given a test sample, X, an one-shot task would aim to classify this test image into one of C categories. For this support set of samples with a representing N unique categories (N-way one shot task) is given to the model in order to decide what is the class of the test images. Notice that none of the samples used in this one-shot task have been seen by the model (the categories are different in training and testing). 
+
+Frequently for one-shot learning tasks, the Omniglot dataset is used for evaluating the performance of the models. Let’s take a deeper look to this database, since it was the dataset used in the paper (MNIST was also tested but we will stick with Omniglot).
+
+## Omniglot Dataset
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/10371630/36079867-c94b19fe-0f7f-11e8-9ef8-6f017d214d43.png" alt="Omniglot Dataset"/>
+</p>
+
+The Omniglot dataset consists in 50 different alphabets, 30 used in a background set and 20 used in a evaluation set. Each alphabet has a number of characters from 14 to 55 different characters drawn by 20 different subjects, resulting in 20 105x105 images for each character. The background set should be used in training for hyper parameter tuning and feature learning, leaving the final results to the remaining 20 alphabets, never seen before by the models trained in the background set. Despite that this paper uses 40 background alphabets and 10 evaluation alphabets. 
+
+This dataset is considered as sort of a MNIST transpose, where the number of possible classes is considerably higher than the number of training samples, making it suitable to one-shot tasks. 
+
+The authors use 20-way one-shot task for evaluating the performance in the evaluation set. For each alphabet it is performed 40 different one-shot tasks, completing a total of 400 tasks for the 10 evaluation alphabets. An example of one one-shot task in this dataset can be seen in the following figure: 
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/10371630/36079892-1df60568-0f80-11e8-8297-a7c6beec4491.png" alt="One-Shot Task"/>
+</p>
+
+Let's dive into the methodology proposed by Koch_et al._ to solve this one-shot task problem.
+
+## Methodology (Under Construction)
+
+
+## References
+- Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.
+
+## Credits
+
+I would like to give credit to a blog post that introduced me to this paper. The blog post has also include code for this paper, despite having some differences regarding this repo (Adam optimizer is used, layerwise learning-rate option is not available). It is a great blog post go check it out: 
+
+- [One Shot Learning and Siamese Networks in Keras](https://sorenbouma.github.io/blog/oneshot/)

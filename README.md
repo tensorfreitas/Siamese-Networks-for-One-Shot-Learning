@@ -31,6 +31,33 @@ Let's dive into the methodology proposed by Koch_et al._ to solve this one-shot 
 
 ## Methodology (Under Construction)
 
+To solve this methodology, the authors propose the use of a Deep Convolutional Siamese Networks.  Siamese Nets were introduced by Bromley and Yan LeCun in the 90s for a verification problem. 
+Siamese nets  are two twin networks that accept distinct inputs but are joined in by a energy function that calculates a distance metric between the outputs of the two nets. 
+The weights of both networks are tied, allowing them to compute the same function. 
+In this paper the weighed L1 distance between twin feature vectors is used as energy function, combined with a sigmoid activations. 
+
+This architecture seems to be designed for verification tasks, and this is exactly how the authors approach the problem. 
+
+In the paper a convolutional neural net was used. 3 Blocks of Cov-RELU-Max Pooling are used followed by a Conv-RELU connected to a fully-connected layer with a sigmoid function. This layer produces the feature vectors that will be fused by the L1 weighed distance layer. The output is fed to a final layer that outputs a value between 1 and 0 (same class or different class).  To assess the best architecture, Bayesian hyper-parameter tuning was performed. The best architecture is depicted in the following image:
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/10371630/36121224-71403aa0-103d-11e8-81c6-6caae24a835c.png" alt="best_architecture"/>
+</p>
+
+L2-Regularization is used in each layer, and as an optimizer it is used Stochastic Gradient Descent with momentum. As previously mentioned, Bayesian hyperparameter optimization was used to find the best parameters for the following topics:
+- Layer-wise Learning Rates (search from 0.0001 to 0.1) 
+- Layer-wise Momentum (search from 0 to 1)
+- Layer-wise L2-regularization penalty (from 0 to 0.1)
+- Filter Size from 3x3 to 20x20
+- Filter numbers from 16 to 256 (using multipliers of 16)
+- Number of units in the fully connected layer from 128 to 4096 (using multipliers of 16)
+
+For training some details were used:
+- The learning rate is defined layer-wise and it is decayed by 1% each epoch.
+- In every layer the momentum is fixed at 0.5 and it is increased linearly each epoch until reaching a value mu.
+- 40 alphabets were used in training and validation and 10 for evaluation
+- The problem is considered a verification task since the train consists in classifying pairs in same or different character. - After that in evaluation phase, the test image is paired with each one of the support set characters. The pair with higher probability output is considered the class for the test image. 
+- Data Augmentation was used with affine distortions (rotations, translations, shear and zoom)
 
 ## References
 - Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.

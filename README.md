@@ -59,6 +59,8 @@ For training some details were used:
 - The problem is considered a verification task since the train consists in classifying pairs in same or different character. - After that in evaluation phase, the test image is paired with each one of the support set characters. The pair with higher probability output is considered the class for the test image. 
 - Data Augmentation was used with affine distortions (rotations, translations, shear and zoom)
 
+## Implementation Details (Under Construction)
+
 ## References
 - Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.
 

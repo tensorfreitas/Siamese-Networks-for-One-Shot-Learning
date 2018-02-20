@@ -275,7 +275,7 @@ class SiameseNetwork:
                       str(best_validation_accuracy))
                 print('Validation Accuracy = ' + str(best_validation_accuracy))
                 break
+        
 
         print('Trained Ended!')
-        K.clear_session()
         return best_validation_accuracy

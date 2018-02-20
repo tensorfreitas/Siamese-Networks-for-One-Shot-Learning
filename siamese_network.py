@@ -145,7 +145,7 @@ class SiameseNetwork:
 
     def __write_logs_to_tensorboard(self, current_iteration, train_losses,
                                     train_accuracies, validation_accuracy,
-                                    evaluation_accuracy, evaluate_each):
+                                    evaluate_each):
         """ Writes the logs to a tensorflow log file
 
         This allows us to see the loss curves and the metrics in tensorboard.
@@ -160,8 +160,6 @@ class SiameseNetwork:
                 in the training set.
             validation_accuracy: accuracy in the current one-shot task in the 
                 validation set
-            evaluation_accuracy: accuracy in the current one-shot task in the
-                evaluation set
             evaluate each: number of iterations defined to evaluate the one-shot
                 tasks.
         """
@@ -182,10 +180,6 @@ class SiameseNetwork:
                 value = summary.value.add()
                 value.simple_value = validation_accuracy
                 value.tag = 'One-Shot Validation Accuracy'
-
-                value = summary.value.add()
-                value.simple_value = evaluation_accuracy
-                value.tag = 'One-Shot Evaluation Accuracy'
 
             self.summary_writer.add_summary(
                 summary, current_iteration - evaluate_each + index + 1)
@@ -210,6 +204,9 @@ class SiameseNetwork:
                 defined a slope to be passed to the training.
             evaluate each: number of iterations defined to evaluate the one-shot
                 tasks.
+            
+        Returns: 
+            Evaluation Accuracy
         """
 
         # First of all let's divide randomly the 30 train alphabets in train
@@ -226,7 +223,6 @@ class SiameseNetwork:
         best_validation_accuracy = 0.0
         best_accuracy_iteration = 0
         validation_accuracy = 0.0
-        best_evaluation_accuracy = 0.0
 
         # Train loop
         for iteration in range(number_of_iterations):
@@ -262,18 +258,14 @@ class SiameseNetwork:
                 validation_accuracy = self.omniglot_loader.one_shot_test(
                     self.model, support_set_size, number_of_runs_per_alphabet, is_validation=True)
 
-                evaluation_accuracy = self.omniglot_loader.one_shot_test(
-                    self.model, support_set_size, number_of_runs_per_alphabet, is_validation=False)
-
                 self.__write_logs_to_tensorboard(
                     iteration, train_losses, train_accuracies,
-                    validation_accuracy, evaluation_accuracy, evaluate_each)
+                    validation_accuracy, evaluate_each)
                 count = 0
 
             if validation_accuracy > best_validation_accuracy:
                 best_validation_accuracy = validation_accuracy
                 best_accuracy_iteration = iteration
-                best_evaluation_accuracy = evaluation_accuracy
 
             # If accuracy does not improve for 10000 batches stop the training
             if iteration - best_accuracy_iteration > 10000:
@@ -281,8 +273,9 @@ class SiameseNetwork:
                     'Early Stopping: validation accuracy did not increase for 10000 iterations')
                 print('Best Validation Accuracy = ' +
                       str(best_validation_accuracy))
-                print('Evaluation Accuracy = ' + str(best_evaluation_accuracy))
+                print('Validation Accuracy = ' + str(best_validation_accuracy))
                 break
 
         print('Trained Ended!')
         K.clear_session()
+        return best_validation_accuracy

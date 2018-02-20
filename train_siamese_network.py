@@ -21,8 +21,7 @@ def main():
     l2_penalization['Conv4'] = 1e-2
     l2_penalization['Dense1'] = 1e-2
     # Path where the logs will be saved
-    #tensorboard_log_path = './logs/siamese_net_sgd_lr10e-4_augmentation_regularization1e-2_momentum_0_9'
-    tensorboard_log_path = './logs2/test'
+    tensorboard_log_path = './logs/siamese_net_lr_10e-4_augmentation_regularization1e-2_momentum_0.9'
     siamese_network = SiameseNetwork(
         dataset_path=dataset_path,
         learning_rate=learning_rate,
@@ -36,13 +35,19 @@ def main():
     # linear epoch slope evolution
     momentum_slope = 0.01
     support_set_size = 20
-    evaluate_each = 100
+    evaluate_each = 1000
     number_of_train_iterations = 1000000
-    siamese_network.train_siamese_network(number_of_iterations=number_of_train_iterations,
-                                          support_set_size=support_set_size, 
-                                          final_momentum=momentum, 
-                                          momentum_slope=momentum_slope,
-                                          evaluate_each=evaluate_each)
+
+    validation_accuracy = siamese_network.train_siamese_network(number_of_iterations=number_of_train_iterations,
+                                                                support_set_size=support_set_size,
+                                                                final_momentum=momentum,
+                                                                momentum_slope=momentum_slope,
+                                                                evaluate_each=evaluate_each)
+
+    evaluation_accuracy = siamese_network.omniglot_loader.one_shot_test(siamese_network.model,
+                                                                        20, 40, False)
+    
+    print('Final Evaluation Accuracy = ' + str(evaluation_accuracy))
 
 
 if __name__ == "__main__":

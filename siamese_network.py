@@ -138,7 +138,7 @@ class SiameseNetwork:
         optimizer = Modified_SGD(
             lr=self.learning_rate,
             lr_multipliers=learning_rate_multipliers,
-            momentum=0.5, clipvalue=1.0)
+            momentum=0.5)
 
         self.model.compile(loss='binary_crossentropy', metrics=['binary_accuracy'],
                            optimizer=optimizer)
@@ -186,7 +186,8 @@ class SiameseNetwork:
             self.summary_writer.flush()
 
     def train_siamese_network(self, number_of_iterations, support_set_size,
-                              final_momentum, momentum_slope, evaluate_each):
+                              final_momentum, momentum_slope, evaluate_each,
+                              model_name):
         """ Train the Siamese net
 
         This is the main function for training the siamese net. 
@@ -204,7 +205,8 @@ class SiameseNetwork:
                 defined a slope to be passed to the training.
             evaluate each: number of iterations defined to evaluate the one-shot
                 tasks.
-            
+            model_name: save_name of the model
+
         Returns: 
             Evaluation Accuracy
         """
@@ -218,11 +220,12 @@ class SiameseNetwork:
         train_losses = np.zeros(shape=(evaluate_each))
         train_accuracies = np.zeros(shape=(evaluate_each))
         count = 0
-
+        earrly_stop = 0
         # Stop criteria variables
         best_validation_accuracy = 0.0
         best_accuracy_iteration = 0
         validation_accuracy = 0.0
+
 
         # Train loop
         for iteration in range(number_of_iterations):
@@ -250,6 +253,12 @@ class SiameseNetwork:
                   (iteration + 1, number_of_iterations, train_loss, train_accuracy, K.get_value(
                       self.model.optimizer.lr)))
 
+            if train_accuracy == 0.5:
+                earrly_stop+=1
+            else:
+                earrly_stop=0
+
+
             # Each 100 iterations perform a one_shot_task and write to tensorboard the
             # stored losses and accuracies
             if (iteration + 1) % evaluate_each == 0:
@@ -263,14 +272,26 @@ class SiameseNetwork:
                     validation_accuracy, evaluate_each)
                 count = 0
 
-            if validation_accuracy == 1.0:
-                print('Early Stopping: Gradient Explosion')                     
-                print('Validation Accuracy = ' + str(best_validation_accuracy))
-                break
+                if (validation_accuracy == 1.0 and train_accuracy == 0.5):
+                    print('Early Stopping: Gradient Explosion')
+                    print('Validation Accuracy = ' +
+                          str(best_validation_accuracy))
+                    return 0
+                elif train_accuracy == 0.0:
+                    return 0
+                else:
+                    # Save the model
+                    if validation_accuracy > best_validation_accuracy:
+                        best_validation_accuracy = validation_accuracy
+                        best_accuracy_iteration = iteration
+                        # Save the model
+                        model_json = self.model.to_json()
+                        with open('models/' + model_name + '.json', "w") as json_file:
+                            json_file.write(model_json)
+                        self.model.save_weights('models/' + model_name + '.h5')
 
-            if validation_accuracy > best_validation_accuracy:
-                best_validation_accuracy = validation_accuracy
-                best_accuracy_iteration = iteration
+            if earrly_stop >= 50:
+                return 0
 
             # If accuracy does not improve for 10000 batches stop the training
             if iteration - best_accuracy_iteration > 10000:
@@ -280,7 +301,6 @@ class SiameseNetwork:
                       str(best_validation_accuracy))
                 print('Validation Accuracy = ' + str(best_validation_accuracy))
                 break
-        
 
         print('Trained Ended!')
         return best_validation_accuracy

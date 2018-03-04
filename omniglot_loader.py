@@ -173,26 +173,33 @@ class OmniglotLoader:
         for pair in range(number_of_pairs):
             image = Image.open(path_list[pair * 2])
             image = np.asarray(image)
-            # image = image / 127.5
-            # image = image - 1.0
+            image = image / image.std() - image.mean()
 
             pairs_of_images[0][pair, :, :, 0] = image
             image = Image.open(path_list[pair * 2 + 1])
             image = np.asarray(image)
-            # image = image / 127.5
-            # image = image - 1.0
+            image = image / image.std() - image.mean()
 
             pairs_of_images[1][pair, :, :, 0] = image
             if not is_one_shot_task:
                 if (pair + 1) % 2 == 0:
-                    labels[pair] = 0.0
+                    labels[pair] = 0
                 else:
-                    labels[pair] = 1.0
+                    labels[pair] = 1
+
             else:
                 if pair == 0:
-                    labels[pair] = 1.0
+                    labels[pair] = 1
                 else:
-                    labels[pair] = 0.0
+                    labels[pair] = 0
+
+        if not is_one_shot_task:
+            random_permutation = np.random.permutation(number_of_pairs)
+            labels = labels[random_permutation]
+            pairs_of_images[0][:, :, :,
+                               :] = pairs_of_images[0][random_permutation, :, :, :]
+            pairs_of_images[1][:, :, :,
+                               :] = pairs_of_images[1][random_permutation, :, :, :]
 
         return pairs_of_images, labels
 
@@ -222,20 +229,11 @@ class OmniglotLoader:
 
         bacth_images_path = []
 
-        if number_of_characters >= self.batch_size/2:
-            selected_characters_indexes = random.sample(
-                range(0, number_of_characters), int(self.batch_size/2))
-        else:
-            # If the number of classes if less than self.batch_size/2 
-            # we have to repeat characters
-            selected_characters_indexes = random.sample(
-                range(0, number_of_characters), number_of_characters)
-            repeated_characters_indexes = random.sample(
-                range(0, number_of_characters), int(self.batch_size/2) - number_of_characters)
-
-            selected_characters_indexes = selected_characters_indexes + \
-                repeated_characters_indexes
-
+        # If the number of classes if less than self.batch_size/2
+        # we have to repeat characters
+        selected_characters_indexes = [random.randint(
+            0, number_of_characters-1) for i in range(self.batch_size)]
+        
         for index in selected_characters_indexes:
             current_character = available_characters[index]
             available_images = (self.train_dictionary[current_alphabet])[
@@ -370,10 +368,8 @@ class OmniglotLoader:
 
         return images, labels
 
-
     def one_shot_test(self, model, support_set_size, number_of_tasks_per_alphabet,
                       is_validation):
-        
         """ Prepare one-shot task and evaluate its performance
 
         Make one shot task in validation and evaluation sets
@@ -401,7 +397,10 @@ class OmniglotLoader:
                     support_set_size, is_validation=is_validation)
                 probabilities = model.predict(images)
 
-                if np.argmax(probabilities) == 0:
+                # Added this condition because noticed that sometimes the outputs
+                # of the classifier was almost the same in all images, meaning that
+                # the argmax would be always by defenition 0.
+                if np.argmax(probabilities) == 0 and probabilities.std()>0.0001:
                     accuracy = 1.0
                 else:
                     accuracy = 0.0

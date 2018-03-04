@@ -42,7 +42,8 @@ def main():
                                                                 support_set_size=support_set_size,
                                                                 final_momentum=momentum,
                                                                 momentum_slope=momentum_slope,
-                                                                evaluate_each=evaluate_each)
+                                                                evaluate_each=evaluate_each, 
+                                                                model_name='siamese_net')
 
     evaluation_accuracy = siamese_network.omniglot_loader.one_shot_test(siamese_network.model,
                                                                         20, 40, False)

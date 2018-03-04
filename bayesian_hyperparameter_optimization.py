@@ -14,7 +14,7 @@ def main():
                        {'name': 'momentum', 'type': 'continuous',
                         'domain': (0.0, 1.0)},
                        {'name': 'momentum_slope', 'type': 'continuous',
-                        'domain': (0.01, 0.1)},
+                        'domain': (0.001, 0.1)},
                        {'name': 'Conv1_multiplier', 'type': 'discrete',
                         'domain': (0.01, 0.1, 1, 10)},
                        {'name': 'Conv2_multiplier', 'type': 'discrete',
@@ -55,18 +55,7 @@ def main():
 
         model_name = 'siamese_net_lr_' + str(current_learning_rate) + \
             'momentum_' + str(current_momentum) + '_slope_' + \
-            str(current_momentum_slope) + '_multipliers_' + \
-            str(current_conv1_multiplier) + '_' + \
-            str(current_conv2_multiplier) + '_' + \
-            str(current_conv3_multiplier) + '_' + \
-            str(current_conv4_multiplier) + '_' + \
-            str(current_dense1_multiplier) + '_' + \
-            '_l2_penalizations_' + \
-            str(current_conv1_penalization) + '_' + \
-            str(current_conv2_penalization) + '_' + \
-            str(current_conv3_penalization) + '_' + \
-            str(current_conv4_penalization) + '_' + \
-            str(current_dense1_penalization)
+            str(current_momentum_slope)
 
         global current_model_number
         current_model_number += 1
@@ -86,11 +75,11 @@ def main():
         l2_penalization['Conv3'] = current_conv3_penalization
         l2_penalization['Conv4'] = current_conv4_penalization
         l2_penalization['Dense1'] = current_dense1_penalization
-
+        K.clear_session()
         siamese_network = SiameseNetwork(
             dataset_path=dataset_path,
             learning_rate=current_learning_rate,
-            batch_size=32, use_augmentation=True,
+            batch_size=128, use_augmentation=True,
             learning_rate_multipliers=learning_rate_multipliers,
             l2_regularization_penalization=l2_penalization,
             tensorboard_log_path=tensorboard_log_path
@@ -99,21 +88,21 @@ def main():
         current_model_number += 1
 
         support_set_size = 20
-        evaluate_each = 1000
+        evaluate_each = 500
         number_of_train_iterations = 100000
-
+        
         validation_accuracy = siamese_network.train_siamese_network(number_of_iterations=number_of_train_iterations,
                                                                     support_set_size=support_set_size,
                                                                     final_momentum=current_momentum,
                                                                     momentum_slope=current_momentum_slope,
-                                                                    evaluate_each=evaluate_each)
+                                                                    evaluate_each=evaluate_each,
+                                                                    model_name=model_name)
 
         if validation_accuracy == 0:
             evaluation_accuracy = 0
         else:
             evaluation_accuracy = siamese_network.omniglot_loader.one_shot_test(siamese_network.model,
                                                                                 20, 40, False)
-
         print("Model: " + model_name +
               ' | Accuracy: ' + str(evaluation_accuracy))
         K.clear_session()
@@ -122,7 +111,7 @@ def main():
     optimizer = GPyOpt.methods.BayesianOptimization(
         f=bayesian_optimization_function, domain=hyperparameters)
 
-    optimizer.run_optimization(max_iter=50)
+    optimizer.run_optimization(max_iter=100)
 
     print("optimized parameters: {0}".format(optimizer.x_opt))
     print("optimized eval_accuracy: {0}".format(1 - optimizer.fx_opt))

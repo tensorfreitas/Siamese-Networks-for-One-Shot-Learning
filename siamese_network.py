@@ -263,6 +263,11 @@ class SiameseNetwork:
                     validation_accuracy, evaluate_each)
                 count = 0
 
+            if validation_accuracy == 1.0:
+                print('Early Stopping: Gradient Explosion')                     
+                print('Validation Accuracy = ' + str(best_validation_accuracy))
+                break
+
             if validation_accuracy > best_validation_accuracy:
                 best_validation_accuracy = validation_accuracy
                 best_accuracy_iteration = iteration

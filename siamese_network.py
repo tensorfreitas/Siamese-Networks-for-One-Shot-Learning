@@ -253,12 +253,6 @@ class SiameseNetwork:
                   (iteration + 1, number_of_iterations, train_loss, train_accuracy, K.get_value(
                       self.model.optimizer.lr)))
 
-            if train_accuracy == 0.5:
-                earrly_stop+=1
-            else:
-                earrly_stop=0
-
-
             # Each 100 iterations perform a one_shot_task and write to tensorboard the
             # stored losses and accuracies
             if (iteration + 1) % evaluate_each == 0:
@@ -272,6 +266,8 @@ class SiameseNetwork:
                     validation_accuracy, evaluate_each)
                 count = 0
 
+                # Some hyperparameters lead to 100%, although the output is almost the same in 
+                # all images. 
                 if (validation_accuracy == 1.0 and train_accuracy == 0.5):
                     print('Early Stopping: Gradient Explosion')
                     print('Validation Accuracy = ' +
@@ -284,14 +280,11 @@ class SiameseNetwork:
                     if validation_accuracy > best_validation_accuracy:
                         best_validation_accuracy = validation_accuracy
                         best_accuracy_iteration = iteration
-                        # Save the model
+                        
                         model_json = self.model.to_json()
                         with open('models/' + model_name + '.json', "w") as json_file:
                             json_file.write(model_json)
                         self.model.save_weights('models/' + model_name + '.h5')
-
-            if earrly_stop >= 50:
-                return 0
 
             # If accuracy does not improve for 10000 batches stop the training
             if iteration - best_accuracy_iteration > 10000:

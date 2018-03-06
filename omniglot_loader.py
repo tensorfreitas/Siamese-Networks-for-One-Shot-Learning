@@ -172,12 +172,12 @@ class OmniglotLoader:
 
         for pair in range(number_of_pairs):
             image = Image.open(path_list[pair * 2])
-            image = np.asarray(image)
+            image = np.asarray(image).astype(np.float64)
             image = image / image.std() - image.mean()
 
             pairs_of_images[0][pair, :, :, 0] = image
             image = Image.open(path_list[pair * 2 + 1])
-            image = np.asarray(image)
+            image = np.asarray(image).astype(np.float64)
             image = image / image.std() - image.mean()
 
             pairs_of_images[1][pair, :, :, 0] = image
@@ -395,12 +395,12 @@ class OmniglotLoader:
             for _ in range(number_of_tasks_per_alphabet):
                 images, _ = self.get_one_shot_batch(
                     support_set_size, is_validation=is_validation)
-                probabilities = model.predict(images)
+                probabilities = model.predict_on_batch(images)
 
                 # Added this condition because noticed that sometimes the outputs
                 # of the classifier was almost the same in all images, meaning that
                 # the argmax would be always by defenition 0.
-                if np.argmax(probabilities) == 0 and probabilities.std()>0.0001:
+                if np.argmax(probabilities) == 0 and probabilities.std()>0.01:
                     accuracy = 1.0
                 else:
                     accuracy = 0.0

@@ -10,7 +10,7 @@ current_model_number = 0
 def main():
 
     hyperparameters = [{'name': 'learning_rate', 'type': 'continuous',
-                        'domain': (10e-4, 10e-1)},
+                        'domain': (10e-6, 10e-4)},
                        {'name': 'momentum', 'type': 'continuous',
                         'domain': (0.0, 1.0)},
                        {'name': 'momentum_slope', 'type': 'continuous',
@@ -79,7 +79,7 @@ def main():
         siamese_network = SiameseNetwork(
             dataset_path=dataset_path,
             learning_rate=current_learning_rate,
-            batch_size=128, use_augmentation=True,
+            batch_size=32, use_augmentation=True,
             learning_rate_multipliers=learning_rate_multipliers,
             l2_regularization_penalization=l2_penalization,
             tensorboard_log_path=tensorboard_log_path

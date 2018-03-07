@@ -4,7 +4,7 @@ from siamese_network import SiameseNetwork
 def main():
     dataset_path = 'Omniglot Dataset'
     use_augmentation = True
-    learning_rate = 10e-3
+    learning_rate = 10e-4
     batch_size = 32
     # Learning Rate multipliers for each layer
     learning_rate_multipliers = {}
@@ -21,7 +21,7 @@ def main():
     l2_penalization['Conv4'] = 1e-2
     l2_penalization['Dense1'] = 1e-4
     # Path where the logs will be saved
-    tensorboard_log_path = './logs/siamese_net_lr10e-3'
+    tensorboard_log_path = './logs/siamese_net_lr10e-4'
     siamese_network = SiameseNetwork(
         dataset_path=dataset_path,
         learning_rate=learning_rate,
@@ -43,10 +43,12 @@ def main():
                                                                 final_momentum=momentum,
                                                                 momentum_slope=momentum_slope,
                                                                 evaluate_each=evaluate_each, 
-                                                                model_name='siamese_net')
+                                                                model_name='siamese_net_lr10e-4')
     if validation_accuracy == 0:
         evaluation_accuracy = 0
     else:
+        # Load the weights with best validation accuracy
+        siamese_network.model.load_weights('siamese_net_lr10e-4.h5')
         evaluation_accuracy = siamese_network.omniglot_loader.one_shot_test(siamese_network.model,
                                                                         20, 40, False)
     

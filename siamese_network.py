@@ -1,3 +1,5 @@
+import os
+
 import keras.backend as K
 from keras.models import Model, Sequential
 from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Input, Subtract, Lambda
@@ -282,6 +284,9 @@ class SiameseNetwork:
                         best_accuracy_iteration = iteration
                         
                         model_json = self.model.to_json()
+
+                        if not os.path.exists('./models'):
+                            os.makedirs('./models')
                         with open('models/' + model_name + '.json', "w") as json_file:
                             json_file.write(model_json)
                         self.model.save_weights('models/' + model_name + '.h5')

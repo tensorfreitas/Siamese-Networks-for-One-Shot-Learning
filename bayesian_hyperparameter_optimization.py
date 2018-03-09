@@ -100,7 +100,9 @@ def main():
 
         if validation_accuracy == 0:
             evaluation_accuracy = 0
-        else:
+        else:        
+            # Load the weights with best validation accuracy
+            siamese_network.model.load_weights('models/' + model_name + '.h5')
             evaluation_accuracy = siamese_network.omniglot_loader.one_shot_test(siamese_network.model,
                                                                                 20, 40, False)
         print("Model: " + model_name +

@@ -61,6 +61,29 @@ For training some details were used:
 
 ## Implementation Details (Under Construction)
 
+When comparing to the original paper, there are some differences in this implementation, namely:
+- The organization of training/validation/evaluation is different from the original paper. In the paper they follow the division suggested by the paper that introduced the Omniglot dataset, while in this implementation I used a different approach: from the 30 alphabets background set, 80% (24) are used for training and 20% (6) are using for validation one-shot tasks.
+- In the paper it is said that the momentum evolves linearly along epochs, but no details about this are present. Therefore I introduced a _momentum_slope_ parameter that controls how the momentum evolves across the epochs. 
+- In the paper the learning rate decays 1% each epoch, while in this implementation it decays 1% each 500 iterations. 
+- The hyperparameter optimization does not include the Siamese network architecture tuning. Since the paper already describes the best architecture, I decided to reduce the hyperparameter space search to just the other parameters. 
+
+### Code Details
+
+There are two main files to run the code in this repo: 
+- *train_siamese_networks.py* that allows you to train a siamese network with a specific set of parameters. 
+- *bayesian_hyperparameter_optimization.py* that does Bayesian hyperparameter optimization as described in the paper. 
+
+Both files store the tensorflow curve logs that can be consulted in tensorboard (in a logs folder that is created), also the models with higher validation one-shot task accuracy are saved in a models folder, allowing to keep the best models. 
+
+Regarding the rest of the code:
+- omniglot_loader is a class used to load the dataset and prepare it to the train and one-shot tasks. 
+- image_augmentor is used by omniglot_loader to augment data like described in the paper. Most of this code is adapted from keras image generator code
+- modified_sgd is an adaptation of the original keras sgd, but it is modified to allow layer_wise learning rate and momentums. 
+- siamese_net is the main class that holds the model and trains it. 
+
+**Notes:**
+- I noticed that some combination of hyperparameters (especially with high learning rates) would lead to train accuracy stabilizing in 0.5, leading to output always the same probability for all images. Therefor I added some early stop conditions to the code.
+
 ## References
 - Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.
 

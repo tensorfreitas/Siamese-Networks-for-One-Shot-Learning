@@ -66,6 +66,7 @@ When comparing to the original paper, there are some differences in this impleme
 - In the paper it is said that the momentum evolves linearly along epochs, but no details about this are present. Therefore I introduced a _momentum_slope_ parameter that controls how the momentum evolves across the epochs. 
 - In the paper the learning rate decays 1% each epoch, while in this implementation it decays 1% each 500 iterations. 
 - The hyperparameter optimization does not include the Siamese network architecture tuning. Since the paper already describes the best architecture, I decided to reduce the hyperparameter space search to just the other parameters. 
+- The weight initialization is not the described by the authors, since I found them to not have high influence on the final results. Therefore, in this implementation the default glorot uniform initialization is used. 
 
 ### Code Details
 
@@ -83,6 +84,8 @@ Regarding the rest of the code:
 
 **Notes:**
 - I noticed that some combination of hyperparameters (especially with high learning rates) would lead to train accuracy stabilizing in 0.5, leading to output always the same probability for all images. Therefor I added some early stop conditions to the code.
+- Due to hardware and time limitations, I did get to run a fully optimization run with the parameters described in the paper. The code is available though for someone who wants to play with it. 
+- I have not been able to reproduce the results reported by the authors (>90% in the evaluation set). I was able to get results in the order of 70%+ with SGD+momentum and 80%+ with Adam optimizer. I believe this happened because a good set of hyperparameters is harder to find with SGD. I believe that with a proper hardware and time, with Bayesian optimization, the results would be much closer to the reported ones (or at least similar to the ones gotten with Adam optimizer). 
 
 ## References
 - Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.

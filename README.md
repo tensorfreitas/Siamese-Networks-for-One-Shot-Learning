@@ -1,4 +1,4 @@
-# Siamese-Networks-for-One-Shot-Learning (Under Construction)
+# Siamese-Networks-for-One-Shot-Learning
 
 This repository was created for me to familiarize with One Shot Learning. The code uses Keras library and the Omniglot dataset.
 This repository tries to implement the code for Siamese Neural Networks for One-shot Image Recognition by Koch _et al._.
@@ -29,7 +29,7 @@ The authors use 20-way one-shot task for evaluating the performance in the evalu
 
 Let's dive into the methodology proposed by Koch_et al._ to solve this one-shot task problem.
 
-## Methodology (Under Construction)
+## Methodology
 
 To solve this methodology, the authors propose the use of a Deep Convolutional Siamese Networks.  Siamese Nets were introduced by Bromley and Yan LeCun in the 90s for a verification problem. 
 Siamese nets  are two twin networks that accept distinct inputs but are joined in by a energy function that calculates a distance metric between the outputs of the two nets. 
@@ -59,7 +59,7 @@ For training some details were used:
 - The problem is considered a verification task since the train consists in classifying pairs in same or different character. - After that in evaluation phase, the test image is paired with each one of the support set characters. The pair with higher probability output is considered the class for the test image. 
 - Data Augmentation was used with affine distortions (rotations, translations, shear and zoom)
 
-## Implementation Details (Under Construction)
+## Implementation Details
 
 When comparing to the original paper, there are some differences in this implementation, namely:
 - The organization of training/validation/evaluation is different from the original paper. In the paper they follow the division suggested by the paper that introduced the Omniglot dataset, while in this implementation I used a different approach: from the 30 alphabets background set, 80% (24) are used for training and 20% (6) are using for validation one-shot tasks.
@@ -86,12 +86,13 @@ Regarding the rest of the code:
 - I noticed that some combination of hyperparameters (especially with high learning rates) would lead to train accuracy stabilizing in 0.5, leading to output always the same probability for all images. Therefor I added some early stop conditions to the code.
 - Due to hardware and time limitations, I did get to run a fully optimization run with the parameters described in the paper. The code is available though for someone who wants to play with it. 
 - I have not been able to reproduce the results reported by the authors (>90% in the evaluation set). I was able to get results in the order of 70%+ with SGD+momentum and 80%+ with Adam optimizer. I believe this happened because a good set of hyperparameters is harder to find with SGD. I believe that with a proper hardware and time, with Bayesian optimization, the results would be much closer to the reported ones (or at least similar to the ones gotten with Adam optimizer). 
+- The code uses GPy and GPyOpt for Bayesian Hyperparameter Optimization. 
 
 ## References
 - Koch, Gregory, Richard Zemel, and Ruslan Salakhutdinov. "Siamese neural networks for one-shot image recognition." ICML Deep Learning Workshop. Vol. 2. 2015.
 
 ## Credits
 
-I would like to give credit to a blog post that introduced me to this paper. The blog post has also include code for this paper, despite having some differences regarding this repo (Adam optimizer is used, layerwise learning-rate option is not available). It is a great blog post go check it out: 
+I would like to give credit to a blog post that introduced me to this paper, when I was searching for Siamese Networks. The blog post  also includes code for this paper, despite having some differences regarding this repo (Adam optimizer is used, layerwise learning-rate option is not available). It is a great blog post go check it out: 
 
 - [One Shot Learning and Siamese Networks in Keras](https://sorenbouma.github.io/blog/oneshot/)

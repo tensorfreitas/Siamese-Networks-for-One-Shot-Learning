@@ -49,12 +49,12 @@ class OmniglotLoader:
         self.image_height = 105
         self.batch_size = batch_size
         self.use_augmentation = use_augmentation
-        self.__train_alphabets = []
-        self.__validation_alphabets = []
-        self.__evaluation_alphabets = []
-        self.__current_train_alphabet_index = 0
-        self.__current_validation_alphabet_index = 0
-        self.__current_evaluation_alphabet_index = 0
+        self._train_alphabets = []
+        self._validation_alphabets = []
+        self._evaluation_alphabets = []
+        self._current_train_alphabet_index = 0
+        self._current_validation_alphabet_index = 0
+        self._current_evaluation_alphabet_index = 0
 
         self.load_dataset()
 
@@ -140,14 +140,14 @@ class OmniglotLoader:
         train_indexes.sort(reverse=True)
 
         for index in train_indexes:
-            self.__train_alphabets.append(available_alphabets[index])
+            self._train_alphabets.append(available_alphabets[index])
             available_alphabets.pop(index)
 
         # The remaining alphabets are saved for validation
-        self.__validation_alphabets = available_alphabets
-        self.__evaluation_alphabets = list(self.evaluation_dictionary.keys())
+        self._validation_alphabets = available_alphabets
+        self._evaluation_alphabets = list(self.evaluation_dictionary.keys())
 
-    def __convert_path_list_to_images_and_labels(self, path_list, is_one_shot_task):
+    def _convert_path_list_to_images_and_labels(self, path_list, is_one_shot_task):
         """ Loads the images and its correspondent labels from the path
 
         Take the list with the path from the current batch, read the images and
@@ -222,7 +222,7 @@ class OmniglotLoader:
 
         """
 
-        current_alphabet = self.__train_alphabets[self.__current_train_alphabet_index]
+        current_alphabet = self._train_alphabets[self._current_train_alphabet_index]
         available_characters = list(
             self.train_dictionary[current_alphabet].keys())
         number_of_characters = len(available_characters)
@@ -269,12 +269,12 @@ class OmniglotLoader:
                 image_path, available_images[image_indexes[0]])
             bacth_images_path.append(image)
 
-        self.__current_train_alphabet_index += 1
+        self._current_train_alphabet_index += 1
 
-        if (self.__current_train_alphabet_index > 23):
-            self.__current_train_alphabet_index = 0
+        if (self._current_train_alphabet_index > 23):
+            self._current_train_alphabet_index = 0
 
-        images, labels = self.__convert_path_list_to_images_and_labels(
+        images, labels = self._convert_path_list_to_images_and_labels(
             bacth_images_path, is_one_shot_task=False)
 
         # Get random transforms if augmentation is on
@@ -299,13 +299,13 @@ class OmniglotLoader:
 
         # Set some variables that will be different for validation and evaluation sets
         if is_validation:
-            alphabets = self.__validation_alphabets
-            current_alphabet_index = self.__current_validation_alphabet_index
+            alphabets = self._validation_alphabets
+            current_alphabet_index = self._current_validation_alphabet_index
             image_folder_name = 'images_background'
             dictionary = self.train_dictionary
         else:
-            alphabets = self.__evaluation_alphabets
-            current_alphabet_index = self.__current_evaluation_alphabet_index
+            alphabets = self._evaluation_alphabets
+            current_alphabet_index = self._current_evaluation_alphabet_index
             image_folder_name = 'images_evaluation'
             dictionary = self.evaluation_dictionary
 
@@ -363,7 +363,7 @@ class OmniglotLoader:
             bacth_images_path.append(test_image)
             bacth_images_path.append(image)
 
-        images, labels = self.__convert_path_list_to_images_and_labels(
+        images, labels = self._convert_path_list_to_images_and_labels(
             bacth_images_path, is_one_shot_task=True)
 
         return images, labels
@@ -382,10 +382,10 @@ class OmniglotLoader:
 
         # Set some variables that depend on dataset
         if is_validation:
-            alphabets = self.__validation_alphabets
+            alphabets = self._validation_alphabets
             print('\nMaking One Shot Task on validation alphabets:')
         else:
-            alphabets = self.__evaluation_alphabets
+            alphabets = self._evaluation_alphabets
             print('\nMaking One Shot Task on evaluation alphabets:')
 
         mean_global_accuracy = 0
@@ -413,9 +413,9 @@ class OmniglotLoader:
             print(alphabet + ' alphabet' + ', accuracy: ' +
                   str(mean_alphabet_accuracy))
             if is_validation:
-                self.__current_validation_alphabet_index += 1
+                self._current_validation_alphabet_index += 1
             else:
-                self.__current_evaluation_alphabet_index += 1
+                self._current_evaluation_alphabet_index += 1
 
         mean_global_accuracy /= (len(alphabets) *
                                  number_of_tasks_per_alphabet)
@@ -424,8 +424,8 @@ class OmniglotLoader:
 
         # reset counter
         if is_validation:
-            self.__current_validation_alphabet_index = 0
+            self._current_validation_alphabet_index = 0
         else:
-            self.__current_evaluation_alphabet_index = 0
+            self._current_evaluation_alphabet_index = 0
 
         return mean_global_accuracy

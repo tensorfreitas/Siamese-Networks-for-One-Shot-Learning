@@ -68,10 +68,10 @@ class SiameseNetwork:
         self.omniglot_loader = OmniglotLoader(
             dataset_path=dataset_path, use_augmentation=use_augmentation, batch_size=batch_size)
         self.summary_writer = tf.summary.FileWriter(tensorboard_log_path)
-        self.__construct_siamese_architecture(learning_rate_multipliers,
+        self._construct_siamese_architecture(learning_rate_multipliers,
                                               l2_regularization_penalization)
 
-    def __construct_siamese_architecture(self, learning_rate_multipliers,
+    def _construct_siamese_architecture(self, learning_rate_multipliers,
                                          l2_regularization_penalization):
         """ Constructs the siamese architecture and stores it in the class
 
@@ -109,7 +109,6 @@ class SiameseNetwork:
                                      kernel_regularizer=l2(
                                          l2_regularization_penalization['Conv4']),
                                      name='Conv4'))
-        convolutional_net.add(MaxPool2D())
 
         convolutional_net.add(Flatten())
         convolutional_net.add(
@@ -145,7 +144,7 @@ class SiameseNetwork:
         self.model.compile(loss='binary_crossentropy', metrics=['binary_accuracy'],
                            optimizer=optimizer)
 
-    def __write_logs_to_tensorboard(self, current_iteration, train_losses,
+    def _write_logs_to_tensorboard(self, current_iteration, train_losses,
                                     train_accuracies, validation_accuracy,
                                     evaluate_each):
         """ Writes the logs to a tensorflow log file
@@ -263,7 +262,7 @@ class SiameseNetwork:
                 validation_accuracy = self.omniglot_loader.one_shot_test(
                     self.model, support_set_size, number_of_runs_per_alphabet, is_validation=True)
 
-                self.__write_logs_to_tensorboard(
+                self._write_logs_to_tensorboard(
                     iteration, train_losses, train_accuracies,
                     validation_accuracy, evaluate_each)
                 count = 0

@@ -27,7 +27,7 @@ class ImageAugmentor:
         self.shift_range = shift_range
         self.zoom_range = zoom_range
 
-    def __transform_matrix_offset_center(self, transformation_matrix, width, height):
+    def _transform_matrix_offset_center(self, transformation_matrix, width, height):
         """ Corrects the offset of tranformation matrix
         
             Corrects the offset of tranformation matrix for the specified image 
@@ -53,7 +53,7 @@ class ImageAugmentor:
         return transformation_matrix
 
     # Applies a provided transformation to the image
-    def __apply_transform(self, image, transformation_matrix):
+    def _apply_transform(self, image, transformation_matrix):
         """ Applies a provided transformation to the image
 
             Args:
@@ -83,7 +83,7 @@ class ImageAugmentor:
 
         return image
 
-    def __perform_random_rotation(self, image):
+    def _perform_random_rotation(self, image):
         """ Applies a random rotation
 
             Args:
@@ -100,13 +100,13 @@ class ImageAugmentor:
                                     [np.sin(theta), np.cos(theta), 0],
                                     [0, 0, 1]])
 
-        transformation_matrix = self.__transform_matrix_offset_center(
+        transformation_matrix = self._transform_matrix_offset_center(
             rotation_matrix, image.shape[0], image.shape[1])
-        image = self.__apply_transform(image, transformation_matrix)
+        image = self._apply_transform(image, transformation_matrix)
 
         return image
     
-    def __perform_random_shear(self, image):
+    def _perform_random_shear(self, image):
         """ Applies a random shear
 
             Args:
@@ -123,14 +123,14 @@ class ImageAugmentor:
                                  [0, np.cos(shear), 0],
                                  [0, 0, 1]])
 
-        transformation_matrix = self.__transform_matrix_offset_center(
+        transformation_matrix = self._transform_matrix_offset_center(
             shear_matrix, image.shape[0], image.shape[1])
-        image = self.__apply_transform(image, transformation_matrix)
+        image = self._apply_transform(image, transformation_matrix)
 
         return image
 
     
-    def __perform_random_shift(self, image):
+    def _perform_random_shift(self, image):
         """ Applies a random shift in x and y
 
             Args:
@@ -149,11 +149,11 @@ class ImageAugmentor:
                                        [0, 1, ty],
                                        [0, 0, 1]])
         transformation_matrix = translation_matrix  # no need to do offset
-        image = self.__apply_transform(image, transformation_matrix)
+        image = self._apply_transform(image, transformation_matrix)
 
         return image
 
-    def __perform_random_zoom(self, image):
+    def _perform_random_zoom(self, image):
         """ Applies a random zoom
 
             Args:
@@ -168,9 +168,9 @@ class ImageAugmentor:
                                 [0, zy, 0],
                                 [0, 0, 1]])
 
-        transformatiom_matrix = self.__transform_matrix_offset_center(
+        transformatiom_matrix = self._transform_matrix_offset_center(
             zoom_matrix, image.shape[0], image.shape[1])
-        image = self.__apply_transform(image, transformatiom_matrix)
+        image = self._apply_transform(image, transformatiom_matrix)
 
         return image
 
@@ -194,22 +194,22 @@ class ImageAugmentor:
             image_2 = images[1][pair_index, :, :, :]
 
             if random_numbers[pair_index * 2, 0] > 0.5:
-                image_1 = self.__perform_random_rotation(image_1)
+                image_1 = self._perform_random_rotation(image_1)
             if random_numbers[pair_index * 2, 1] > 0.5:
-                image_1 = self.__perform_random_shear(image_1)
+                image_1 = self._perform_random_shear(image_1)
             if random_numbers[pair_index * 2, 2] > 0.5:
-                image_1 = self.__perform_random_shift(image_1)
+                image_1 = self._perform_random_shift(image_1)
             if random_numbers[pair_index * 2, 3] > 0.5:
-                image_1 = self.__perform_random_zoom(image_1)
+                image_1 = self._perform_random_zoom(image_1)
 
             if random_numbers[pair_index * 2 + 1, 0] > 0.5:
-                image_2 = self.__perform_random_rotation(image_2)
+                image_2 = self._perform_random_rotation(image_2)
             if random_numbers[pair_index * 2 + 1, 1] > 0.5:
-                image_2 = self.__perform_random_shear(image_2)
+                image_2 = self._perform_random_shear(image_2)
             if random_numbers[pair_index * 2 + 1, 2] > 0.5:
-                image_2 = self.__perform_random_shift(image_2)
+                image_2 = self._perform_random_shift(image_2)
             if random_numbers[pair_index * 2 + 1, 3] > 0.5:
-                image_2 = self.__perform_random_zoom(image_2)
+                image_2 = self._perform_random_zoom(image_2)
 
             images[0][pair_index, :, :, :] = image_1
             images[1][pair_index, :, :, :] = image_2

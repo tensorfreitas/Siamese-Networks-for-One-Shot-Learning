@@ -66,7 +66,7 @@ When comparing to the original paper, there are some differences in this impleme
 - In the paper it is said that the momentum evolves linearly along epochs, but no details about this are present. Therefore I introduced a _momentum_slope_ parameter that controls how the momentum evolves across the epochs. 
 - In the paper the learning rate decays 1% each epoch, while in this implementation it decays 1% each 500 iterations. 
 - The hyperparameter optimization does not include the Siamese network architecture tuning. Since the paper already describes the best architecture, I decided to reduce the hyperparameter space search to just the other parameters. 
-- The weight initialization is not the described by the authors, since I found them to not have high influence on the final results. Therefore, in this implementation the default glorot uniform initialization is used. 
+- Weight initialization: I found them to not have high influence on the final results. Therefore, in this implementation the default glorot uniform initialization is used. 
 
 ### Code Details
 

@@ -243,7 +243,7 @@ class OmniglotLoader:
 
             # Random select a 3 indexes of images from the same character (Remember
             # that for each character we have 20 examples).
-            image_indexes = random.sample(range(0, 19), 3)
+            image_indexes = random.sample(range(0, 20), 3)
             image = os.path.join(
                 image_path, available_images[image_indexes[0]])
             bacth_images_path.append(image)
